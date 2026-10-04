@@ -63,14 +63,20 @@ turndownService.addRule('table', {
     colCount = headerCells.length;
     if (colCount === 0) return '';
 
-    const headerLine = `| ${headerCells.map((cell) => cell.textContent?.trim() || ' ').join(' | ')} |`;
-    const separatorLine = `| ${headerCells.map(() => '---').join(' | ')} |`;
+    const cellMarkdown = (cell: Element | undefined) => cell
+      ? turndownService.turndown(cell.innerHTML).trim().replace(/ *\r?\n/g, '<br>').replace(/(?<!\\)\|/g, '\\|')
+      : '';
+    const headerLine = `| ${headerCells.map((cell) => cellMarkdown(cell) || ' ').join(' | ')} |`;
+    const separatorLine = `| ${headerCells.map((cell) => {
+      const align = cell.getAttribute('align') || (cell as HTMLElement).style?.textAlign;
+      return align === 'left' ? ':---' : align === 'center' ? ':---:' : align === 'right' ? '---:' : '---';
+    }).join(' | ')} |`;
     lines.push(headerLine, separatorLine);
 
     // Body rows
     for (let i = 1; i < rows.length; i++) {
       const cells = Array.from(rows[i].querySelectorAll('td, th'));
-      const rowContent = Array.from({ length: colCount }, (_, idx) => cells[idx]?.textContent?.trim() || '');
+      const rowContent = Array.from({ length: colCount }, (_, idx) => cellMarkdown(cells[idx]));
       lines.push(`| ${rowContent.join(' | ')} |`);
     }
 
@@ -80,7 +86,20 @@ turndownService.addRule('table', {
 
 export function markdownToVisualHtml(markdown: string): string {
   if (!markdown) return '<p><br></p>';
-  return marked.parse(markdown, { gfm: true, breaks: false, async: false }) as string;
+  const html = marked.parse(markdown, { gfm: true, breaks: false, async: false }) as string;
+  return html.replace(/<blockquote>([\s\S]*?)<\/blockquote>/g, (quote, content: string) =>
+    isEmptyQuoteHtml(content) ? `<blockquote data-empty-quote>${content || '<p><br></p>'}</blockquote>` : quote);
+}
+
+function isEmptyQuoteHtml(html: string): boolean {
+  return html.replace(/<\/?p\b[^>]*>|<br\b[^>]*>|&nbsp;/gi, '').trim() === '';
+}
+
+// Attributes only: the hint is painted by CSS and never becomes document text.
+export function updateEmptyQuoteHints(root: ParentNode): void {
+  for (const quote of root.querySelectorAll('blockquote')) {
+    quote.toggleAttribute('data-empty-quote', isEmptyQuoteHtml(quote.innerHTML));
+  }
 }
 
 export function visualHtmlToMarkdown(html: string): string {

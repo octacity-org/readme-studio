@@ -19,7 +19,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - uses: oven-sh/setup-bun@v2
+      - name: Runtime versions
+        run: |
+          node --version
+          bun --version
       - run: bun install --frozen-lockfile
       - run: bun run test
       - run: bun run typecheck

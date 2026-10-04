@@ -5,6 +5,9 @@ import './App.css';
 import { GitHubModal, type GitHubModalTab } from './components/GitHubModal';
 import { ProfileInspector } from './components/ProfileInspector';
 import { VisualEditor, type VisualEditorHandle } from './components/VisualEditor';
+import { FloatingWidget } from './components/FloatingWidget';
+import { ToolIcon } from './components/ToolIcon';
+import { TOOL_DRAG_TYPE, type WidgetPosition } from './lib/workspace-widgets';
 import { getGameDataUri } from './lib/arcade-preview';
 import { fetchRealGitHubContributions, getCachedContributions } from './lib/contributions';
 import {
@@ -126,7 +129,10 @@ function App() {
   const [activeTool, setActiveTool] = createSignal<ToolPanel>('heading');
   const [inspectorTab, setInspectorTab] = createSignal<InspectorTab>('tool');
   const [toolboxCollapsed, setToolboxCollapsed] = createSignal(collapsePanelsInitially);
-  const [inspectorCollapsed, setInspectorCollapsed] = createSignal(collapsePanelsInitially);
+  const [widgetOpen, setWidgetOpen] = createSignal(false);
+  const [widgetPosition, setWidgetPosition] = createSignal<WidgetPosition>({ left: 270, top: 100 });
+  const [insertDraft, setInsertDraft] = createSignal('');
+  const [toolDragHint, setToolDragHint] = createSignal<{ label: string; left: number; top: number } | null>(null);
   const [saved, setSaved] = createSignal(true);
   const [draggingFile, setDraggingFile] = createSignal(false);
   const [treePaths, setTreePaths] = createSignal('src/App.tsx\nsrc/lib/readme.ts\npublic/favicon.ico\nREADME.md');
@@ -143,6 +149,8 @@ function App() {
   const [activityRefresh, setActivityRefresh] = createSignal(0);
 
   let editor: HTMLTextAreaElement | undefined;
+  let toolPointerDrag: { tool: ToolPanel; x: number; y: number; moved: boolean } | undefined;
+  let suppressToolClickUntil = 0;
   let visualEditor: VisualEditorHandle | undefined;
   let fileInput!: HTMLInputElement;
 
@@ -257,11 +265,74 @@ function App() {
     ];
   });
 
-  function selectTool(tool: ToolPanel): void {
+  function selectTool(tool: ToolPanel, event?: MouseEvent | DragEvent | PointerEvent): void {
+    if (event?.type === 'click' && performance.now() < suppressToolClickUntil) return;
     setActiveTool(tool);
+    const helper = insertHelpers.find(({ id }) => id === tool);
+    if (helper) setInsertDraft(`${helper.before}${helper.placeholder}${helper.after}`);
     setInspectorTab('tool');
-    setInspectorCollapsed(false);
+    setWidgetPosition({ left: event ? event.clientX + 20 : 270, top: event ? event.clientY + 12 : 100 });
+    setWidgetOpen(true);
     if (window.innerWidth <= 900) setToolboxCollapsed(true);
+  }
+
+  function openDocumentWidget(tab: Exclude<InspectorTab, 'tool'>): void {
+    setInspectorTab(tab);
+    setWidgetPosition({ left: window.innerWidth - 370, top: 90 });
+    setWidgetOpen(true);
+    if (window.innerWidth <= 900) setToolboxCollapsed(true);
+  }
+
+  function dragTool(event: DragEvent, tool: ToolPanel): void {
+    event.dataTransfer?.setData(TOOL_DRAG_TYPE, tool);
+    if (event.dataTransfer) event.dataTransfer.effectAllowed = 'copy';
+    setWidgetOpen(false);
+  }
+
+  function dropTool(id: string, event: DragEvent | PointerEvent): void {
+    const helper = insertHelpers.find((tool) => tool.id === id);
+    if (helper) {
+      setActiveTool(helper.id);
+      applyInsertion(helper.before, helper.after, helper.placeholder);
+    } else if (id === 'badge' || id === 'toc' || id === 'tree' || profileToolIds.has(id as ProfileToolId)) {
+      selectTool(id as ToolPanel, event);
+    }
+  }
+
+  function startToolPointer(event: PointerEvent, tool: ToolPanel): void {
+    if (event.button !== 0) return;
+    event.preventDefault();
+    toolPointerDrag = { tool, x: event.clientX, y: event.clientY, moved: false };
+    event.currentTarget instanceof HTMLElement && event.currentTarget.setPointerCapture(event.pointerId);
+  }
+
+  function moveToolPointer(event: PointerEvent): void {
+    if (!toolPointerDrag) return;
+    if (Math.hypot(event.clientX - toolPointerDrag.x, event.clientY - toolPointerDrag.y) > 6) toolPointerDrag.moved = true;
+    if (!toolPointerDrag.moved) return;
+    setWidgetOpen(false);
+    setToolDragHint({ label: 'Insert block', left: event.clientX + 14, top: event.clientY + 14 });
+    if (panelMode() === 'editor' && editorStyle() === 'visual') visualEditor?.previewDrop(event.clientX, event.clientY);
+  }
+
+  function endToolPointer(event: PointerEvent): void {
+    if (toolPointerDrag?.moved) {
+      suppressToolClickUntil = performance.now() + 250;
+      if (panelMode() === 'editor') {
+        if (editorStyle() === 'visual') visualEditor?.dropTool(toolPointerDrag.tool, event);
+        else if (editor?.isConnected) {
+          const rect = editor.getBoundingClientRect();
+          if (event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom) dropTool(toolPointerDrag.tool, event);
+        }
+      }
+    }
+    cancelToolPointer();
+  }
+
+  function cancelToolPointer(): void {
+    toolPointerDrag = undefined;
+    setToolDragHint(null);
+    visualEditor?.cancelDrop();
   }
 
   function updateBadge<K extends keyof BadgeOptions>(key: K, value: BadgeOptions[K], keepPreset = false): void {
@@ -406,7 +477,7 @@ function App() {
   }
 
   return (
-    <div class="app-shell" onDragEnter={(event) => { event.preventDefault(); setDraggingFile(true); }} onDragOver={(event) => event.preventDefault()} onDragLeave={(event) => { if (event.currentTarget === event.target) setDraggingFile(false); }} onDrop={(event) => { event.preventDefault(); setDraggingFile(false); importFile(event.dataTransfer?.files[0]); }}>
+    <div class="app-shell" onDragEnter={(event) => { if (event.dataTransfer?.types.includes('Files')) { event.preventDefault(); setDraggingFile(true); } }} onDragOver={(event) => { if (event.dataTransfer?.types.includes('Files')) event.preventDefault(); }} onDragLeave={(event) => { if (event.currentTarget === event.target) setDraggingFile(false); }} onDrop={(event) => { if (event.dataTransfer?.types.includes('Files')) { event.preventDefault(); setDraggingFile(false); importFile(event.dataTransfer.files[0]); } }}>
       <header class="topbar">
         <div class="brand" aria-label="Readme Studio"><span class="brand-mark">R/</span><span>Readme Studio</span></div>
         <div class="topbar-context">
@@ -414,10 +485,10 @@ function App() {
           <div class="topbar-workspace-controls">
             <div class="editor-style-switcher" aria-label="Editor style">
               <button class={{ active: editorStyle() === 'visual' }} aria-label="Visual editor" onClick={() => setEditorStyle('visual')}>
-                ✨ <span class="control-label">Visual Editor</span>
+                <ToolIcon tool="visual" /><span class="control-label">Visual Editor</span>
               </button>
               <button class={{ active: editorStyle() === 'plain' }} aria-label="Plain Markdown editor" onClick={() => setEditorStyle('plain')}>
-                📝 <span class="control-label">Plain Markdown</span>
+                <ToolIcon tool="markdown" /><span class="control-label">Plain Markdown</span>
               </button>
             </div>
             <div class="view-switcher" aria-label="Workspace view">
@@ -433,8 +504,8 @@ function App() {
           <input ref={fileInput} class="visually-hidden" type="file" accept=".md,.markdown,text/markdown" onChange={(event) => importFile(event.currentTarget.files?.[0])} />
           
           <Show when={session()} fallback={
-            <button class="button github-btn" onClick={() => startGitHubLogin()}>
-              🐙 Connect GitHub
+            <button class="button github-btn" aria-label="Connect GitHub" onClick={() => startGitHubLogin()}>
+              <ToolIcon tool="github" /><span class="github-label">Connect GitHub</span>
             </button>
           }>
             <button class="button github-btn connected" onClick={() => openGitHubModal('open')} title="Manage GitHub connection">
@@ -452,29 +523,32 @@ function App() {
         </div>
       </header>
 
-      <div class={['studio-body', { 'toolbox-collapsed': toolboxCollapsed(), 'inspector-collapsed': inspectorCollapsed() }]}>
-        <button class="edge-toggle toolbox-toggle" aria-label={toolboxCollapsed() ? 'Expand toolbox' : 'Collapse toolbox'} aria-expanded={toolboxCollapsed() ? 'false' : 'true'} onClick={() => setToolboxCollapsed((collapsed) => !collapsed)}><span aria-hidden="true">{toolboxCollapsed() ? '›' : '‹'}</span></button>
+      <div class={['studio-body', { 'toolbox-collapsed': toolboxCollapsed() }]}>
+        <Show when={toolboxCollapsed()}><button class="edge-toggle toolbox-expand" aria-label="Expand toolbox" aria-expanded="false" onClick={() => setToolboxCollapsed(false)}><ToolIcon tool="expand" /></button></Show>
 
         <aside class="toolbox-panel" aria-label="README toolbox">
-          <div class="panel-heading"><p class="eyebrow">Readme kit</p><h2>Toolbox</h2><p>Choose a building block, then configure it in the inspector.</p></div>
-          <div class="tool-groups">
-            <section class="tool-group">
+          <div class="panel-heading"><p class="eyebrow">Readme kit</p><h2>Toolbox</h2><button class="toolbox-collapse" aria-label="Collapse toolbox" aria-expanded="true" onClick={() => setToolboxCollapsed(true)}><ToolIcon tool="collapse" /></button><p>Drag to insert · Click to configure.</p></div>
+          <div class="tool-groups" onPointerMove={moveToolPointer} onPointerUp={endToolPointer} onPointerCancel={cancelToolPointer}>
+            <section class="tool-group insert-tools">
               <h3>Insert</h3>
-              <div class="tool-list">{insertHelpers.map((tool) => <button class={{ active: activeTool() === tool.id }} onClick={() => selectTool(tool.id)}><span>{tool.hint}</span><strong>{tool.label}</strong></button>)}</div>
+              <div class="tool-list">{insertHelpers.map((tool) => <button draggable="true" onPointerDown={(event) => startToolPointer(event, tool.id)} onDragStart={(event) => dragTool(event, tool.id)} class={{ active: widgetOpen() && inspectorTab() === 'tool' && activeTool() === tool.id }} onClick={(event) => selectTool(tool.id, event)}><ToolIcon tool={tool.id} /><strong>{tool.label}</strong></button>)}</div>
             </section>
             <section class="tool-group">
               <h3>Badges</h3>
-              <div class="tool-list"><button class={{ active: activeTool() === 'badge' }} onClick={() => selectTool('badge')}><span>◆</span><strong>Shields.io</strong></button></div>
+              <div class="tool-list tool-list-rows"><button draggable="true" onPointerDown={(event) => startToolPointer(event, 'badge')} onDragStart={(event) => dragTool(event, 'badge')} class={{ active: widgetOpen() && inspectorTab() === 'tool' && activeTool() === 'badge' }} onClick={(event) => selectTool('badge', event)}><ToolIcon tool="badge" /><strong>Shields.io</strong></button></div>
             </section>
             <section class="tool-group profile-tools">
               <h3>Profile README</h3>
-              <div class="tool-list">{PROFILE_TOOL_CATALOG.map((tool) => <button class={{ active: activeTool() === tool.id }} onClick={() => selectTool(tool.id)}><span>{tool.hint}</span><strong>{tool.label}</strong></button>)}</div>
+              <div class="tool-list tool-list-rows">{PROFILE_TOOL_CATALOG.map((tool) => <button draggable="true" onPointerDown={(event) => startToolPointer(event, tool.id)} onDragStart={(event) => dragTool(event, tool.id)} class={{ active: widgetOpen() && inspectorTab() === 'tool' && activeTool() === tool.id }} onClick={(event) => selectTool(tool.id, event)}><ToolIcon tool={tool.id} /><strong>{tool.label}</strong></button>)}</div>
             </section>
             <section class="tool-group">
               <h3>Utilities</h3>
-              <div class="tool-list">
-                <button class={{ active: activeTool() === 'toc' }} onClick={() => selectTool('toc')}><span>≡</span><strong>Table of contents</strong></button>
-                <button class={{ active: activeTool() === 'tree' }} onClick={() => selectTool('tree')}><span>⌘</span><strong>Project tree</strong></button>
+              <div class="tool-list tool-list-rows">
+                <button draggable="true" onPointerDown={(event) => startToolPointer(event, 'toc')} onDragStart={(event) => dragTool(event, 'toc')} onClick={(event) => selectTool('toc', event)}><ToolIcon tool="toc" /><strong>Table of contents</strong></button>
+                <button draggable="true" onPointerDown={(event) => startToolPointer(event, 'tree')} onDragStart={(event) => dragTool(event, 'tree')} onClick={(event) => selectTool('tree', event)}><ToolIcon tool="tree" /><strong>Project tree</strong></button>
+                <button onClick={() => openDocumentWidget('document')}><ToolIcon tool="document" /><strong>Outline & statistics</strong></button>
+                <button onClick={() => openDocumentWidget('checks')}><ToolIcon tool="checks" /><strong>README checks</strong></button>
+                <button onClick={() => openDocumentWidget('export')}><ToolIcon tool="export" /><strong>Export & workflows</strong></button>
               </div>
             </section>
           </div>
@@ -492,6 +566,19 @@ function App() {
                   }}
                   onInput={(event) => setMarkdown(event.currentTarget.value)}
                   onKeyDown={handleKeyboard}
+                  onDragOver={(event) => {
+                    if (event.dataTransfer?.types.includes(TOOL_DRAG_TYPE)) {
+                      event.preventDefault();
+                      event.dataTransfer.dropEffect = 'copy';
+                    }
+                  }}
+                  onDrop={(event) => {
+                    const tool = event.dataTransfer?.getData(TOOL_DRAG_TYPE);
+                    if (!tool) return;
+                    event.preventDefault();
+                    event.stopPropagation();
+                    dropTool(tool, event);
+                  }}
                   spellcheck={false}
                   aria-label="Markdown editor"
                 />
@@ -504,6 +591,8 @@ function App() {
                     if (editor?.isConnected) editor.value = newMd;
                   }}
                   onOpenBadgeTool={() => selectTool('badge')}
+                  onToolDrop={dropTool}
+                  onContextOpen={() => setWidgetOpen(false)}
                 />
               </Show>
             </section>
@@ -517,9 +606,14 @@ function App() {
           </div>
         </main>
 
-        <aside class="inspector" aria-label="Document inspector">
-          <div class="inspector-heading"><div><p class="eyebrow">Context</p><h2>Inspector</h2></div><span>{stats().words} words</span></div>
-          <nav class="inspector-tabs" aria-label="Inspector sections">{(['tool', 'document', 'checks', 'export'] as const).map((tab) => <button class={{ active: inspectorTab() === tab }} onClick={() => setInspectorTab(tab)}>{tab}</button>)}</nav>
+        <Show when={widgetOpen()}>
+        <FloatingWidget title={inspectorTab() === 'tool' ? activeToolTitle() : ({ document: 'Document', checks: 'README checks', export: 'Export' } as const)[inspectorTab() as 'document' | 'checks' | 'export']} position={widgetPosition()} onClose={() => {
+          setWidgetOpen(false);
+          if (panelMode() === 'editor') {
+            if (editorStyle() === 'visual') visualEditor?.focus();
+            else editor?.focus();
+          }
+        }}>
           <div class="inspector-content">
             <Show when={inspectorTab() === 'tool'}>
               <div aria-label="Tool options">
@@ -570,7 +664,7 @@ function App() {
                     </Show>
                   </>
                 }>
-                  {(tool) => <><p class="inspector-description">{tool().description}</p><pre class="snippet-preview">{tool().before}{tool().placeholder}{tool().after}</pre><button class="wide-action" onClick={() => applyInsertion(tool().before, tool().after, tool().placeholder)}>Insert at cursor</button></>}
+                  {(tool) => <><p class="inspector-description">{tool().description}</p><label>Markdown block<textarea class="path-editor" value={insertDraft()} onInput={(event) => setInsertDraft(event.currentTarget.value)} /></label><button class="wide-action" onClick={() => { applyInsertion(insertDraft()); setWidgetOpen(false); }}>Insert at cursor</button></>}
                 </Show>
               </div>
             </Show>
@@ -616,12 +710,12 @@ function App() {
               </nav>
             </Show>
           </div>
-        </aside>
-
-        <button class="edge-toggle inspector-toggle" aria-label={inspectorCollapsed() ? 'Expand inspector' : 'Collapse inspector'} aria-expanded={inspectorCollapsed() ? 'false' : 'true'} onClick={() => setInspectorCollapsed((collapsed) => !collapsed)}><span aria-hidden="true">{inspectorCollapsed() ? '‹' : '›'}</span></button>
+        </FloatingWidget>
+        </Show>
       </div>
 
       <Show when={draggingFile()}><div class="drop-overlay"><div><span aria-hidden="true">↓</span><strong>Drop your Markdown file here</strong><small>Imports .md and .markdown documents</small></div></div></Show>
+      <Show when={toolDragHint()}>{(hint) => <div class="tool-drag-hint" style={{ left: `${hint().left}px`, top: `${hint().top}px` }}>{hint().label}</div>}</Show>
 
       {/* GitHub Integration Modal */}
       <Show when={gitHubModalOpen()}>
