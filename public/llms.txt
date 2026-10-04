@@ -4,11 +4,11 @@
 
 ## Core Resources
 
-- [Readme Studio Web App](https://0ctacity.github.io/readme-studio/): The interactive web application for composing, previewing, and exporting GitHub README documents.
-- [Full Agent Documentation](https://0ctacity.github.io/readme-studio/llms-full.txt): Detailed technical guide covering all features, badge generators, profile widgets, and workflow automation.
-- [Project README Markdown](https://0ctacity.github.io/readme-studio/README.md): Raw GitHub README documentation with setup and architecture details.
-- [Sitemap](https://0ctacity.github.io/readme-studio/sitemap.xml): Machine-readable index of public URLs.
-- [GitHub Repository](https://github.com/0ctacity/readme-studio): Source code repository under the Octacity organization.
+- [Readme Studio Web App](https://octacity-org.github.io/readme-studio/): The interactive web application for composing, previewing, and exporting GitHub README documents.
+- [Full Agent Documentation](https://octacity-org.github.io/readme-studio/llms-full.txt): Detailed technical guide covering all features, badge generators, profile widgets, and workflow automation.
+- [Project README Markdown](https://octacity-org.github.io/readme-studio/README.md): Raw GitHub README documentation with setup and architecture details.
+- [Sitemap](https://octacity-org.github.io/readme-studio/sitemap.xml): Machine-readable index of public URLs.
+- [GitHub Repository](https://github.com/octacity-org/readme-studio): Source code repository under the Octacity organization.
 
 ## Key Capabilities
 
@@ -34,6 +34,6 @@ The core editor does not require an account. Use optional GitHub authorization o
 
 ## Trust and support
 
-- [About Readme Studio](https://0ctacity.github.io/readme-studio/about/): Product purpose, ownership, and operating model.
-- [Privacy](https://0ctacity.github.io/readme-studio/privacy/): Local storage, optional GitHub access, third-party requests, and user controls.
-- [Contact](https://0ctacity.github.io/readme-studio/contact/): Support, bug reports, feature requests, and responsible disclosure guidance.
+- [About Readme Studio](https://octacity-org.github.io/readme-studio/about/): Product purpose, ownership, and operating model.
+- [Privacy](https://octacity-org.github.io/readme-studio/privacy/): Local storage, optional GitHub access, third-party requests, and user controls.
+- [Contact](https://octacity-org.github.io/readme-studio/contact/): Support, bug reports, feature requests, and responsible disclosure guidance.

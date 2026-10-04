@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://0ctacity.github.io/readme-studio/sitemap.xml
+Sitemap: https://octacity-org.github.io/readme-studio/sitemap.xml

@@ -5,9 +5,9 @@
 ## Project Overview
 
 - Product Name: Readme Studio
-- Brand / Organization: Octacity (https://github.com/0ctacity)
-- Live Web Application: https://0ctacity.github.io/readme-studio/
-- Repository: https://github.com/0ctacity/readme-studio
+- Brand / Organization: Octacity (https://github.com/octacity-org)
+- Live Web Application: https://octacity-org.github.io/readme-studio/
+- Repository: https://github.com/octacity-org/readme-studio
 - License: MIT
 - Tech Stack: SolidJS 2.0, TypeScript 5.9, Vite 8.x, Bun
 
@@ -46,18 +46,18 @@ Generates standard and dynamic Shields.io markdown links:
 
 ## Machine-Readable Endpoints
 
-- Web App Homepage: https://0ctacity.github.io/readme-studio/
-- Agent Index (llms.txt): https://0ctacity.github.io/readme-studio/llms.txt
-- Full Agent Documentation (llms-full.txt): https://0ctacity.github.io/readme-studio/llms-full.txt
-- Sitemap: https://0ctacity.github.io/readme-studio/sitemap.xml
-- Robots: https://0ctacity.github.io/readme-studio/robots.txt
-- Markdown README: https://0ctacity.github.io/readme-studio/README.md
-- 404 Error Recovery: https://0ctacity.github.io/readme-studio/404.html
+- Web App Homepage: https://octacity-org.github.io/readme-studio/
+- Agent Index (llms.txt): https://octacity-org.github.io/readme-studio/llms.txt
+- Full Agent Documentation (llms-full.txt): https://octacity-org.github.io/readme-studio/llms-full.txt
+- Sitemap: https://octacity-org.github.io/readme-studio/sitemap.xml
+- Robots: https://octacity-org.github.io/readme-studio/robots.txt
+- Markdown README: https://octacity-org.github.io/readme-studio/README.md
+- 404 Error Recovery: https://octacity-org.github.io/readme-studio/404.html
 
 ## Product Information and Trust
 
-- About: https://0ctacity.github.io/readme-studio/about/
-- Privacy: https://0ctacity.github.io/readme-studio/privacy/
-- Contact and support: https://0ctacity.github.io/readme-studio/contact/
+- About: https://octacity-org.github.io/readme-studio/about/
+- Privacy: https://octacity-org.github.io/readme-studio/privacy/
+- Contact and support: https://octacity-org.github.io/readme-studio/contact/
 
 Readme Studio is best suited to interactive README authoring and generation. It does not provide collaborative editing, cloud draft synchronization, or a general-purpose API for autonomous document editing. GitHub authorization is optional and is only required for repository-backed actions.

@@ -56,6 +56,6 @@
   <rect x="916" y="417" width="194" height="44" rx="4" fill="#ed6338"/>
   <text x="1013" y="444" text-anchor="middle" fill="#17211c" font-family="Arial, sans-serif" font-size="13" font-weight="800">EXPORT README</text>
 
-  <text x="66" y="612" fill="#9da7a1" font-family="ui-monospace, Menlo, monospace" font-size="12">0ctacity.github.io/readme-studio</text>
+  <text x="66" y="612" fill="#9da7a1" font-family="ui-monospace, Menlo, monospace" font-size="12">octacity-org.github.io/readme-studio</text>
   <text x="1134" y="612" text-anchor="end" fill="#ed6338" font-family="ui-monospace, Menlo, monospace" font-size="12" font-weight="700">by Octacity</text>
 </svg>

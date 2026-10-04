@@ -10,7 +10,7 @@ describe('Agent readiness & Discoverability', () => {
     const llmsTxt = fs.readFileSync(path.join(publicDir, 'llms.txt'), 'utf-8');
     expect(llmsTxt).toStartWith('# Readme Studio by Octacity');
     expect(llmsTxt).toContain('## Core Resources');
-    expect(llmsTxt).toContain('https://0ctacity.github.io/readme-studio/');
+    expect(llmsTxt).toContain('https://octacity-org.github.io/readme-studio/');
     expect(llmsTxt).toContain('llms-full.txt');
     expect(llmsTxt).toContain('## When to use Readme Studio');
     expect(llmsTxt).toContain('## Limitations');
@@ -26,19 +26,19 @@ describe('Agent readiness & Discoverability', () => {
     const errorPage = fs.readFileSync(path.join(publicDir, '404.html'), 'utf-8');
     expect(errorPage).toContain('404 Not Found');
     expect(errorPage).toContain('Octacity');
-    expect(errorPage).toContain('https://0ctacity.github.io/readme-studio/llms.txt');
-    expect(errorPage).toContain('https://0ctacity.github.io/readme-studio/sitemap.xml');
+    expect(errorPage).toContain('https://octacity-org.github.io/readme-studio/llms.txt');
+    expect(errorPage).toContain('https://octacity-org.github.io/readme-studio/sitemap.xml');
   });
 
   test('robots.txt and sitemap.xml are configured correctly', () => {
     const robots = fs.readFileSync(path.join(publicDir, 'robots.txt'), 'utf-8');
     expect(robots).toContain('User-agent: *');
     expect(robots).toContain('Allow: /');
-    expect(robots).toContain('Sitemap: https://0ctacity.github.io/readme-studio/sitemap.xml');
+    expect(robots).toContain('Sitemap: https://octacity-org.github.io/readme-studio/sitemap.xml');
 
     const sitemap = fs.readFileSync(path.join(publicDir, 'sitemap.xml'), 'utf-8');
-    expect(sitemap).toContain('https://0ctacity.github.io/readme-studio/</loc>');
-    expect(sitemap).toContain('https://0ctacity.github.io/readme-studio/llms.txt</loc>');
+    expect(sitemap).toContain('https://octacity-org.github.io/readme-studio/</loc>');
+    expect(sitemap).toContain('https://octacity-org.github.io/readme-studio/llms.txt</loc>');
   });
 
   test('Document.tsx renders rich semantic content, JSON-LD, and alternate markdown links', () => {
@@ -70,7 +70,7 @@ describe('Agent readiness & Discoverability', () => {
         .trim();
 
       expect(page).toContain(`<h1>${heading}</h1>`);
-      expect(page).toContain(`rel="canonical" href="https://0ctacity.github.io/readme-studio/${directory}/"`);
+      expect(page).toContain(`rel="canonical" href="https://octacity-org.github.io/readme-studio/${directory}/"`);
       expect(page).toContain('href="/readme-studio/"');
       expect(readableText.length).toBeGreaterThan(500);
     }

@@ -7,17 +7,17 @@ export default function Document(props: ParentProps) {
     '@graph': [
       {
         '@type': 'Organization',
-        '@id': 'https://github.com/0ctacity#organization',
+        '@id': 'https://github.com/octacity-org#organization',
         name: 'Octacity',
-        url: 'https://github.com/0ctacity',
-        sameAs: ['https://github.com/0ctacity'],
+        url: 'https://github.com/octacity-org',
+        sameAs: ['https://github.com/octacity-org'],
       },
       {
         '@type': 'WebApplication',
-        '@id': 'https://0ctacity.github.io/readme-studio/#webapp',
+        '@id': 'https://octacity-org.github.io/readme-studio/#webapp',
         name: 'Readme Studio',
-        alternateName: ['Readme Studio by Octacity', '0ctacity Readme Studio'],
-        url: 'https://0ctacity.github.io/readme-studio/',
+        alternateName: ['Readme Studio by Octacity', 'octacity-org Readme Studio'],
+        url: 'https://octacity-org.github.io/readme-studio/',
         description: 'A fast, private, browser-based visual Markdown editor for creating polished GitHub repository and profile READMEs by Octacity.',
         applicationCategory: 'DeveloperApplication',
         operatingSystem: 'Any (Web Browser)',
@@ -30,10 +30,10 @@ export default function Document(props: ParentProps) {
           priceCurrency: 'USD',
         },
         author: {
-          '@id': 'https://github.com/0ctacity#organization',
+          '@id': 'https://github.com/octacity-org#organization',
         },
         publisher: {
-          '@id': 'https://github.com/0ctacity#organization',
+          '@id': 'https://github.com/octacity-org#organization',
         },
         featureList: [
           'Real-time GitHub Flavored Markdown (GFM) editing with live sanitized preview',
@@ -43,8 +43,8 @@ export default function Document(props: ParentProps) {
           'Directory tree generator and automatic Table of Contents',
           'Local-first draft persistence with optional GitHub integration',
         ],
-        image: 'https://0ctacity.github.io/readme-studio/social-card.png',
-        screenshot: 'https://0ctacity.github.io/readme-studio/social-card.png',
+        image: 'https://octacity-org.github.io/readme-studio/social-card.png',
+        screenshot: 'https://octacity-org.github.io/readme-studio/social-card.png',
       },
     ],
   });
@@ -63,27 +63,27 @@ export default function Document(props: ParentProps) {
         <meta name="theme-color" content="#17211c" />
 
         {/* Canonical & Agent Alternate links */}
-        <link rel="canonical" href="https://0ctacity.github.io/readme-studio/" />
-        <link rel="alternate" type="text/markdown" href="https://0ctacity.github.io/readme-studio/llms.txt" title="Agent documentation in Markdown (llms.txt)" />
-        <link rel="alternate" type="text/markdown" href="https://0ctacity.github.io/readme-studio/README.md" title="Project README in Markdown" />
-        <link rel="help" type="text/markdown" href="https://0ctacity.github.io/readme-studio/llms.txt" />
-        <link rel="sitemap" type="application/xml" href="https://0ctacity.github.io/readme-studio/sitemap.xml" />
+        <link rel="canonical" href="https://octacity-org.github.io/readme-studio/" />
+        <link rel="alternate" type="text/markdown" href="https://octacity-org.github.io/readme-studio/llms.txt" title="Agent documentation in Markdown (llms.txt)" />
+        <link rel="alternate" type="text/markdown" href="https://octacity-org.github.io/readme-studio/README.md" title="Project README in Markdown" />
+        <link rel="help" type="text/markdown" href="https://octacity-org.github.io/readme-studio/llms.txt" />
+        <link rel="sitemap" type="application/xml" href="https://octacity-org.github.io/readme-studio/sitemap.xml" />
         <link rel="icon" href="/readme-studio/favicon.ico" />
 
         {/* OpenGraph & Social Discoverability */}
         <meta property="og:type" content="website" />
         <meta property="og:title" content="Readme Studio by Octacity — Build better GitHub READMEs" />
         <meta property="og:description" content="A fast, private, browser-based visual Markdown editor for polished GitHub repository and profile READMEs by Octacity." />
-        <meta property="og:url" content="https://0ctacity.github.io/readme-studio/" />
+        <meta property="og:url" content="https://octacity-org.github.io/readme-studio/" />
         <meta property="og:site_name" content="Readme Studio by Octacity" />
-        <meta property="og:image" content="https://0ctacity.github.io/readme-studio/social-card.png" />
+        <meta property="og:image" content="https://octacity-org.github.io/readme-studio/social-card.png" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:image:alt" content="Readme Studio editor workbench with toolbox, Markdown workspace, and inspector" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Readme Studio by Octacity" />
         <meta name="twitter:description" content="A fast, private, browser-based visual Markdown editor for polished GitHub repository and profile READMEs by Octacity." />
-        <meta name="twitter:image" content="https://0ctacity.github.io/readme-studio/social-card.png" />
+        <meta name="twitter:image" content="https://octacity-org.github.io/readme-studio/social-card.png" />
         <meta name="twitter:image:alt" content="Readme Studio editor workbench with toolbox, Markdown workspace, and inspector" />
 
         {/* JSON-LD Structured Data */}
@@ -136,7 +136,7 @@ export default function Document(props: ParentProps) {
             <a href="/readme-studio/about/">About</a>
             <a href="/readme-studio/privacy/">Privacy</a>
             <a href="/readme-studio/contact/">Contact</a>
-            <a href="https://github.com/0ctacity/readme-studio">Source on GitHub</a>
+            <a href="https://github.com/octacity-org/readme-studio">Source on GitHub</a>
           </footer>
         </main>
         {props.children}

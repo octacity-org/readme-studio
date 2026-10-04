@@ -3,6 +3,6 @@ dist
 .dev.vars
 .dev.vars.*
 .wrangler
-worker/
+worker/*
 worker-configuration.d.ts
 wrangler.jsonc

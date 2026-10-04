@@ -4,14 +4,14 @@
 
 **A fast, interactive visual editor for GitHub repository and profile READMEs.**
 
-[![Deploy to GitHub Pages](https://img.shields.io/github/actions/workflow/status/0ctacity/readme-studio/deploy.yml?branch=main&style=flat-square&logo=github&label=deploy)](https://github.com/0ctacity/readme-studio/actions)
+[![Deploy to GitHub Pages](https://img.shields.io/github/actions/workflow/status/octacity-org/readme-studio/deploy.yml?branch=main&style=flat-square&logo=github&label=deploy)](https://github.com/octacity-org/readme-studio/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 [![SolidJS](https://img.shields.io/badge/SolidJS-2.0-2c4f7c?style=flat-square&logo=solid)](https://solidjs.com)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-8.x-646cff?style=flat-square&logo=vite)](https://vitejs.dev/)
 [![Bun](https://img.shields.io/badge/Bun-1.3-14151a?style=flat-square&logo=bun)](https://bun.sh/)
 
-[**Live Demo**](https://0ctacity.github.io/readme-studio/) • [**Report Bug**](https://github.com/0ctacity/readme-studio/issues) • [**Request Feature**](https://github.com/0ctacity/readme-studio/issues)
+[**Live Demo**](https://octacity-org.github.io/readme-studio/) • [**Report Bug**](https://github.com/octacity-org/readme-studio/issues) • [**Request Feature**](https://github.com/octacity-org/readme-studio/issues)
 
 </div>
 
@@ -55,7 +55,7 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/0ctacity/readme-studio.git
+git clone https://github.com/octacity-org/readme-studio.git
 cd readme-studio
 
 # Install dependencies
@@ -90,13 +90,13 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 Readme Studio builds into a **pure static client** (`dist/client`).
 
-The repository is configured with an automated [GitHub Actions deployment workflow](https://github.com/0ctacity/readme-studio/blob/main/.github/workflows/deploy.yml).
+The repository is configured with an automated [GitHub Actions deployment workflow](https://github.com/octacity-org/readme-studio/blob/main/.github/workflows/deploy.yml).
 
 Whenever changes are pushed to the `main` branch:
 1. Bun installs dependencies.
 2. Unit tests and type checks are validated.
 3. The static bundle is built via `bun run build`.
-4. Artifacts are automatically published to **GitHub Pages** at `https://0ctacity.github.io/readme-studio/`.
+4. Artifacts are automatically published to **GitHub Pages** at `https://octacity-org.github.io/readme-studio/`.
 
 ---
 
