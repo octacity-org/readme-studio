@@ -12,15 +12,24 @@ describe('VisualEditor behavior wiring', () => {
   });
 
   test('offers undoable controls for the selected table cell', () => {
-    expect(source).toContain("type TableAction = 'add-row' | 'add-column' | 'delete-row' | 'delete-column' | 'clear-cell' | 'delete-table'");
     expect(source).toContain('aria-label="Table controls"');
-    expect(source).toContain("editTable('add-row')");
-    expect(source).toContain("editTable('add-column')");
-    expect(source).toContain("editTable('delete-row')");
-    expect(source).toContain("editTable('delete-column')");
-    expect(source).toContain("editTable('clear-cell')");
-    expect(source).toContain("editTable('delete-table')");
-    expect(source).toContain("disabled={tableControls()?.isHeader}");
-    expect(source).toContain("document.execCommand('insertHTML', false, replacementHtml)");
+    for (const action of [
+      'row-above', 'row-below', 'row-up', 'row-down',
+      'column-left', 'column-right', 'column-left-move', 'column-right-move',
+      'delete-row', 'delete-column', 'clear-cell', 'delete-table',
+    ]) {
+      expect(source).toContain(`onClick={() => editTable('${action}')}`);
+    }
+    expect(source).toContain('onClick={() => editTable(`align-${align}`)}');
+    expect(source).toMatch(/<button\b[^>]*disabled=\{state\(\)\.isHeader\}[^>]*onClick=\{\(\) => editTable\('delete-row'\)\}/);
+    expect(source).toMatch(/<button\b[^>]*disabled=\{state\(\)\.columnCount <= 1\}[^>]*onClick=\{\(\) => editTable\('delete-column'\)\}/);
+
+    const replacement = source.slice(source.indexOf('  function replaceTable('), source.indexOf('  function editTable('));
+    expect(replacement).toMatch(/history\.captureSelection\(selectionBookmark\(\)\);[\s\S]*table\.replaceWith\(replacement\);[\s\S]*triggerSync\(\);/);
+    const edit = source.slice(source.indexOf('  function editTable('), source.indexOf('  function handleTablePaste('));
+    expect(edit).toContain('editTableCell(table, rowIndex, columnIndex, action)');
+    expect(edit).toContain('replaceTable(selected.table, table, position)');
+    expect(edit).toMatch(/if \(action === 'delete-table'\) \{[\s\S]*history\.captureSelection\(selectionBookmark\(\)\);[\s\S]*selected\.table\.replaceWith\(paragraph\);[\s\S]*triggerSync\(\);/);
+    expect(source).toContain('history.record({ html: editorRef.innerHTML, selection: selectionBookmark() }, typing)');
   });
 });
