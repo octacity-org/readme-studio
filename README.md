@@ -105,7 +105,7 @@ Signing in with GitHub is optional. It enables three things:
 - **Real contribution data:** use your actual contribution calendar in the snake and arcade previews.
 - **Publish to GitHub:** commit `README.md` and any generated workflow files to a branch in one commit.
 
-Sign-in requests the GitHub `repo` and `workflow` scopes, because publishing can write workflow files. Your browser receives an encrypted Readme Studio session that expires after 30 minutes. The page cannot read your GitHub token from it.
+Readme Studio signs in through a GitHub App. It can publish to a repository only when the app is installed on that repository with **Contents** write access (plus **Workflows** write access for workflow files) and your own account can push to it. Your browser receives an encrypted Readme Studio session that expires after 30 minutes. The page cannot read your GitHub token from it.
 
 ## Use it from an AI agent (MCP)
 
